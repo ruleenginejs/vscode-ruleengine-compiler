@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { CompileRuleToJavaScriptCommand } from './commands';
+import { CompileRuleFileCommand } from './commands';
 
 export function activate(context: vscode.ExtensionContext) {
-  context.subscriptions.push(vscode.commands.registerCommand(CompileRuleToJavaScriptCommand.id, CompileRuleToJavaScriptCommand.execute));
+  context.subscriptions.push(vscode.commands.registerCommand(CompileRuleFileCommand.id, CompileRuleFileCommand.execute));
 }

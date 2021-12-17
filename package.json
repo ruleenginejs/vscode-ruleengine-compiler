@@ -32,7 +32,7 @@
   ],
   "icon": "images/logo.png",
   "activationEvents": [
-    "onCommand:ruleengine.ruleCompiler.compileToJavaScript"
+    "onCommand:ruleengine.ruleCompiler.compile"
   ],
   "main": "./dist/extension.js",
   "capabilities": {
@@ -44,22 +44,42 @@
   "contributes": {
     "configuration": [
       {
-        "title": "Rule Engine",
+        "title": "Rule Engine Compiler",
         "properties": {
-          "ruleengine.compiler.schemaCheckEnabled": {
+          "ruleengine.compiler.schemaCheck": {
             "type": "boolean",
             "default": true,
-            "description": "Checking a file with the schema before compiling."
+            "description": "Enable checking a file with the schema before compiling."
           }
         }
       }
     ],
     "commands": [
       {
-        "command": "ruleengine.ruleCompiler.compileToJavaScript",
+        "command": "ruleengine.ruleCompiler.compile",
         "title": "Rule Engine: Compile"
       }
-    ]
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "ruleengine.ruleCompiler.compile",
+          "when": "resourceExtname == .rule"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "ruleengine.ruleCompiler.compile",
+          "when": "resourceExtname == .rule"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "ruleengine.ruleCompiler.compile",
+          "when": "resourceExtname == .rule"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run build",
