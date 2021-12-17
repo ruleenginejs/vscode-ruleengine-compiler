@@ -1,0 +1,100 @@
+{
+  "name": "vscode-ruleengine-compiler",
+  "displayName": "Rule Engine Compiler",
+  "description": "Pipeline compiler to javascript",
+  "author": "Nikolay Naumenkov <nikolas.it.web@gmail.com>",
+  "license": "SEE LICENSE IN LICENSE",
+  "version": "0.0.1",
+  "homepage": "https://github.com/ruleenginejs/vscode-ruleengine-compiler",
+  "bugs": {
+    "url": "https://github.com/ruleenginejs/vscode-ruleengine-compiler/issues",
+    "email": "nikolas.it.web@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruleenginejs/vscode-ruleengine-compiler.git"
+  },
+  "publisher": "ruleengine",
+  "keywords": [
+    "rule engine",
+    "ruleengine",
+    "rule compiler",
+    "pipeline compiler",
+    "rule",
+    "pipeline",
+    "javascript"
+  ],
+  "engines": {
+    "vscode": "^1.63.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "icon": "images/logo.png",
+  "activationEvents": [
+    "onCommand:ruleengine.ruleCompiler.compileToJavaScript"
+  ],
+  "main": "./dist/extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    },
+    "virtualWorkspaces": true
+  },
+  "contributes": {
+    "configuration": [
+      {
+        "title": "Rule Engine",
+        "properties": {
+          "ruleengine.compiler.schemaCheckEnabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "Checking a file with the schema before compiling."
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "command": "ruleengine.ruleCompiler.compileToJavaScript",
+        "title": "Rule Engine: Compile"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "test-compile": "tsc -p ./",
+    "test-watch": "tsc -watch -p ./",
+    "pretest": "npm run test-compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "deploy": "vsce publish --no-yarn",
+    "postversion": "npm run push",
+    "push": "git push origin master --tags",
+    "vsix": "npx vsce package"
+  },
+  "dependencies": {
+    "worker-rpc": "0.2.0"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.2.0",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.11.13",
+    "@types/vscode": "^1.63.0",
+    "@typescript-eslint/eslint-plugin": "^5.7.0",
+    "@typescript-eslint/parser": "^5.7.0",
+    "eslint": "^8.4.1",
+    "glob": "^7.2.0",
+    "mocha": "^9.1.3",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.4",
+    "vsce": "^2.5.1",
+    "@vscode/test-electron": "^2.0.0",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1"
+  }
+}
