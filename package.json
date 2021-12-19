@@ -1,7 +1,7 @@
 {
   "name": "vscode-ruleengine-compiler",
   "displayName": "Rule Engine Compiler",
-  "description": "Pipeline compiler to javascript",
+  "description": "Pipeline compiler for javascript",
   "author": "Nikolay Naumenkov <nikolas.it.web@gmail.com>",
   "license": "SEE LICENSE IN LICENSE",
   "version": "0.0.1",
@@ -50,6 +50,11 @@
             "type": "boolean",
             "default": true,
             "description": "Enable checking a file with the schema before compiling."
+          },
+          "ruleengine.compiler.runtimeModule": {
+            "type": "string",
+            "default": "@ruleenginejs/runtime",
+            "description": "Runtime module name."
           }
         }
       }
@@ -70,7 +75,7 @@
       "explorer/context": [
         {
           "command": "ruleengine.ruleCompiler.compile",
-          "when": "resourceExtname == .rule"
+          "when": "explorerResourceIsFolder || resourceExtname == .rule"
         }
       ],
       "editor/title/context": [
@@ -98,7 +103,9 @@
     "vsix": "npx vsce package"
   },
   "dependencies": {
-    "worker-rpc": "0.2.0"
+    "worker-rpc": "0.2.0",
+    "@ruleenginejs/compiler": "1.0.2",
+    "@ruleenginejs/schema": "1.0.2"
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
