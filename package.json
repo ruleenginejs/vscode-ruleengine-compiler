@@ -69,7 +69,7 @@
       "commandPalette": [
         {
           "command": "ruleengine.ruleCompiler.compile",
-          "when": "resourceExtname == .rule"
+          "when": "ruleengine.ruleCompiler.hidden"
         }
       ],
       "explorer/context": [
