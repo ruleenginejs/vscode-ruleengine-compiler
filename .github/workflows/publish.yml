@@ -21,10 +21,8 @@ jobs:
       run: npm -v
     - name: Install project dependencies
       run: npm ci
-    - name: Install media dependencies
-      run: cd media/editor && npm ci && cd ../..
     - name: Build vsix package
-      run: npx vsce package -o vscode-ruleengine-editor.vsix
+      run: npx vsce package -o vscode-ruleengine-compiler.vsix
     - name: Get latest release version number
       id: get_version
       uses: battila7/get-version-action@v2
@@ -47,8 +45,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./vscode-ruleengine-editor.vsix
-        asset_name: vscode-ruleengine-editor-${{ steps.get_version.outputs.version-without-v }}.vsix
+        asset_path: ./vscode-ruleengine-compiler.vsix
+        asset_name: vscode-ruleengine-compiler-${{ steps.get_version.outputs.version-without-v }}.vsix
         asset_content_type: application/octet-stream
     - name: Publish
       if: success()
