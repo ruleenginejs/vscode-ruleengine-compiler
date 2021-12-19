@@ -1,5 +1,5 @@
 # Change Log
 
-## [0.0.1] - 2021-08-03
+## [0.0.2] - 2021-12-19
 ### Added
-- Initial release.
+- Compile command.
