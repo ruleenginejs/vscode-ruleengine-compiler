@@ -2,7 +2,7 @@
 
 Built-in pipeline files compiler with .rule extension for the Rule Engine.
 
-![Screen](./images/screen.gif)
+![Screen](https://raw.githubusercontent.com/ruleenginejs/vscode-ruleengine-compiler/master/images/screen.gif)
 
 ## License
 
