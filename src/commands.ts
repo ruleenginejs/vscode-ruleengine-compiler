@@ -89,7 +89,7 @@ function showCompilationError(err: CompilationError) {
     details.push(err.cause instanceof Error ? err.cause.message : err.cause);
   }
   details.push(err.uri.fsPath);
-  vscode.window.showErrorMessage(`"Compilation error: ${details.join(", ")}`);
+  vscode.window.showErrorMessage(`Compilation error: ${details.join(", ")}`);
 }
 
 async function findRuleFiles(urisAndFileTypes: [vscode.Uri, vscode.FileType?][], token: vscode.CancellationToken): Promise<vscode.Uri[]> {
