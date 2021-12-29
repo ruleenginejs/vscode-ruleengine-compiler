@@ -27,7 +27,7 @@ export class CompileRuleFileCommand {
           title: "Compiling",
           cancellable: true
         }, async (progress, token) => {
-          progress.report({ message: "preparing…" });
+          progress.report({ message: "searching files…" });
           const urisAndFileTypes: [vscode.Uri, vscode.FileType?][] = sourceUris.map(uri => [uri, undefined]);
           const urisToCompile = await findRuleFiles(urisAndFileTypes, token);
           if (urisToCompile.length === 0 || token.isCancellationRequested) {
