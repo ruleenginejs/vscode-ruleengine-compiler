@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.4] - 2021-12-31
+### Fixed
+- Progress messages.
+
 ## [0.0.3] - 2021-12-20
 ### Fixed
 - Bugs and README.
