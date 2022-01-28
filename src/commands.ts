@@ -136,7 +136,7 @@ let _schemaValidator: any = null;
 
 function validateSchema(data: string) {
   if (!_schemaValidator) {
-    _schemaValidator = (schema as any)((schema as any).SCHEMAS.PIPELINE);
+    _schemaValidator = (schema as any)(schema.SCHEMAS.PIPELINE);
   }
   const success = _schemaValidator(data);
   return [success, _schemaValidator.errors];
