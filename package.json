@@ -44,7 +44,7 @@
       {
         "title": "Rule Engine Compiler",
         "properties": {
-          "ruleengine.compiler.schemaCheck": {
+          "ruleengine.compiler.checkSchema": {
             "type": "boolean",
             "default": true,
             "description": "Enable checking a file with the schema before compiling."
@@ -53,6 +53,21 @@
             "type": "string",
             "default": "@ruleenginejs/runtime",
             "description": "Runtime module name."
+          },
+          "ruleengine.compiler.moduleSystem": {
+            "type": "string",
+            "default": "prompt",
+            "enum": [
+              "commonjs",
+              "esModule",
+              "prompt"
+            ],
+            "description": "Module system used in compiled code.",
+            "enumDescriptions": [
+              "Module system use require() function and module.exports",
+              "Module system use import and export",
+              "Pick module system"
+            ]
           }
         }
       }

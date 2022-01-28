@@ -3,6 +3,7 @@ import * as path from "path";
 import { isDefined } from './types';
 import * as schema from "@ruleenginejs/schema";
 import { generateCode } from "@ruleenginejs/compiler";
+import { ModuleSystem, showModuleSystemQuickPick } from './util';
 
 export class CompileRuleFileCommand {
   public static readonly id = "ruleengine.ruleCompiler.compile";
@@ -10,6 +11,11 @@ export class CompileRuleFileCommand {
   public static async execute(uri: vscode.Uri, uris: vscode.Uri[]): Promise<any> {
     if (!isDefined(uri) && !isDefined(uris)) {
       vscode.window.showInformationMessage("Compilation from the command palette is not supported. Use the explorer/tab context menu.");
+      return;
+    }
+
+    const moduleSystem = await pickModuleSystem();
+    if (!isDefined(moduleSystem)) {
       return;
     }
 
@@ -43,7 +49,7 @@ export class CompileRuleFileCommand {
             progress.report({ message });
 
             try {
-              await compileAndSave(fileUri);
+              await compileAndSave(fileUri, moduleSystem);
             } catch (e) {
               throw new CompilationError(fileUri, e as any);
             }
@@ -142,11 +148,11 @@ function validateSchema(data: string) {
   return [success, _schemaValidator.errors];
 }
 
-async function compileAndSave(sourceUri: vscode.Uri): Promise<void> {
+async function compileAndSave(sourceUri: vscode.Uri, moduleSystem?: ModuleSystem): Promise<void> {
   const binaryData = await vscode.workspace.fs.readFile(sourceUri);
   let fileContent = JSON.parse(Buffer.from(binaryData).toString("utf8"));
 
-  if (vscode.workspace.getConfiguration("ruleengine.compiler").get("schemaCheck", false)) {
+  if (vscode.workspace.getConfiguration("ruleengine.compiler").get("checkSchema", false)) {
     const [success, errors] = validateSchema(fileContent);
     if (!success) {
       throw new SchemaValidationError(sourceUri, errors);
@@ -154,7 +160,8 @@ async function compileAndSave(sourceUri: vscode.Uri): Promise<void> {
   }
 
   const code = generateCode(fileContent, {
-    runtimeModule: vscode.workspace.getConfiguration("ruleengine.compiler").get("runtimeModule", ""),
+    runtimeModule: vscode.workspace.getConfiguration("ruleengine.compiler").get("runtimeModule"),
+    esModule: moduleSystem === ModuleSystem.esModule
   });
 
   const pathInfo = path.parse(sourceUri.fsPath);
@@ -162,6 +169,19 @@ async function compileAndSave(sourceUri: vscode.Uri): Promise<void> {
   const saveData = Buffer.from(code, "utf8");
 
   await vscode.workspace.fs.writeFile(newFileUri, saveData);
+}
+
+async function pickModuleSystem(): Promise<ModuleSystem | undefined> {
+  let moduleSystem: ModuleSystem | undefined = ModuleSystem.commonJs;
+  const moduleSystemConfig = vscode.workspace.getConfiguration("ruleengine.compiler").get("moduleSystem");
+  if (moduleSystemConfig === "prompt") {
+    moduleSystem = await showModuleSystemQuickPick();
+  } else if (moduleSystemConfig === "commonjs") {
+    moduleSystem = ModuleSystem.commonJs;
+  } else if (moduleSystemConfig === "esModule") {
+    moduleSystem = ModuleSystem.esModule;
+  }
+  return moduleSystem;
 }
 
 class SchemaValidationError extends Error {
