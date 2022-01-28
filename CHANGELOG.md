@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.5] - 2022-01-29
+### Add
+- ES Module support.
+
 ## [0.0.4] - 2021-12-31
 ### Fixed
 - Progress messages.
