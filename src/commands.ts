@@ -140,7 +140,7 @@ function checkExtension(uri: vscode.Uri, extension: string): boolean {
 
 let _schemaValidator: any = null;
 
-function validateSchema(data: string) {
+function validateSchema(data: any) {
   if (!_schemaValidator) {
     _schemaValidator = (schema as any)(schema.SCHEMAS.PIPELINE);
   }
@@ -149,20 +149,25 @@ function validateSchema(data: string) {
 }
 
 async function compileAndSave(sourceUri: vscode.Uri, moduleSystem?: ModuleSystem): Promise<void> {
+  let code = "";
+
   const binaryData = await vscode.workspace.fs.readFile(sourceUri);
-  let fileContent = JSON.parse(Buffer.from(binaryData).toString("utf8"));
+  const fileContents = Buffer.from(binaryData).toString("utf8");
+  if (fileContents) {
+    let fileData = JSON.parse(fileContents);
 
-  if (vscode.workspace.getConfiguration("ruleengine.compiler").get("checkSchema", false)) {
-    const [success, errors] = validateSchema(fileContent);
-    if (!success) {
-      throw new SchemaValidationError(sourceUri, errors);
+    if (vscode.workspace.getConfiguration("ruleengine.compiler").get("checkSchema", false)) {
+      const [success, errors] = validateSchema(fileData);
+      if (!success) {
+        throw new SchemaValidationError(sourceUri, errors);
+      }
     }
-  }
 
-  const code = generateCode(fileContent, {
-    runtimeModule: vscode.workspace.getConfiguration("ruleengine.compiler").get("runtimeModule"),
-    esModule: moduleSystem === ModuleSystem.esModule
-  });
+    code = generateCode(fileData, {
+      runtimeModule: vscode.workspace.getConfiguration("ruleengine.compiler").get("runtimeModule"),
+      esModule: moduleSystem === ModuleSystem.esModule
+    });
+  }
 
   const pathInfo = path.parse(sourceUri.fsPath);
   const newFileUri = vscode.Uri.file(path.join(pathInfo.dir, `${pathInfo.name}.js`));
