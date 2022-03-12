@@ -4,6 +4,7 @@ Built-in pipeline files compiler with .rule extension for the Rule Engine.
 
 ![Screen](https://raw.githubusercontent.com/ruleenginejs/vscode-ruleengine-compiler/master/images/screen.gif)
 
-## License
+## More Information
 
-[MIT](LICENSE)
+- [Documentation](https://ruleengine.org)
+- [License](LICENSE)
