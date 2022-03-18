@@ -170,7 +170,8 @@ async function compileAndSave(sourceUri: vscode.Uri, moduleSystem?: ModuleSystem
   }
 
   const pathInfo = path.parse(sourceUri.fsPath);
-  const newFileUri = vscode.Uri.file(path.join(pathInfo.dir, `${pathInfo.name}.js`));
+  const fileExtension = vscode.workspace.getConfiguration("ruleengine.compiler").get("fileExtension");
+  const newFileUri = vscode.Uri.file(path.join(pathInfo.dir, `${pathInfo.name}.${fileExtension}`));
   const saveData = Buffer.from(code, "utf8");
 
   await vscode.workspace.fs.writeFile(newFileUri, saveData);

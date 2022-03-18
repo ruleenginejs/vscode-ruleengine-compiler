@@ -54,6 +54,11 @@
             "default": "@ruleenginejs/runtime",
             "description": "Runtime module name."
           },
+          "ruleengine.compiler.fileExtension": {
+            "type": "string",
+            "default": "js",
+            "description": "Defines the extension 'js', 'ts' when creating a new compiled file."
+          },
           "ruleengine.compiler.moduleSystem": {
             "type": "string",
             "default": "prompt",
