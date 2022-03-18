@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.7] - 2022-03-18
+### Added
+- Change compiled file extension.
+
 ## [0.0.6] - 2022-03-12
 ### Fixed
 - Bugs.
