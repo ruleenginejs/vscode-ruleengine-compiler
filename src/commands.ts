@@ -1,16 +1,21 @@
 import * as vscode from 'vscode';
-import * as path from "path";
+import * as path from 'path';
 import { isDefined } from './types';
-import * as schema from "@ruleenginejs/schema";
-import { generateCode } from "@ruleenginejs/compiler";
+import * as schema from '@ruleenginejs/schema';
+import { generateCode } from '@ruleenginejs/compiler';
 import { ModuleSystem, showModuleSystemQuickPick } from './util';
 
 export class CompileRuleFileCommand {
-  public static readonly id = "ruleengine.ruleCompiler.compile";
+  public static readonly id = 'ruleengine.ruleCompiler.compile';
 
-  public static async execute(uri: vscode.Uri, uris: vscode.Uri[]): Promise<any> {
+  public static async execute(
+    uri: vscode.Uri,
+    uris: vscode.Uri[]
+  ): Promise<any> {
     if (!isDefined(uri) && !isDefined(uris)) {
-      vscode.window.showInformationMessage("Compilation from the command palette is not supported. Use the explorer/tab context menu.");
+      vscode.window.showInformationMessage(
+        'Compilation from the command palette is not supported. Use the explorer/tab context menu.'
+      );
       return;
     }
 
@@ -28,38 +33,42 @@ export class CompileRuleFileCommand {
 
     if (sourceUris.length > 0) {
       try {
-        await vscode.window.withProgress({
-          location: vscode.ProgressLocation.Notification,
-          title: "Compiling",
-          cancellable: true
-        }, async (progress, token) => {
-          progress.report({ message: "searching files…" });
-          const urisAndFileTypes: [vscode.Uri, vscode.FileType?][] = sourceUris.map(uri => [uri, undefined]);
-          const urisToCompile = await findRuleFiles(urisAndFileTypes, token);
-          if (urisToCompile.length === 0 || token.isCancellationRequested) {
-            return;
-          }
-
-          const step = 100 / urisToCompile.length;
-          for (let i = 0; i < urisToCompile.length; i++) {
-            const fileUri = urisToCompile[i];
-            const fileName = path.basename(fileUri.fsPath);
-            const dirname = path.basename(path.dirname(fileUri.fsPath));
-            const message = `${dirname}${path.sep}${fileName}`;
-            progress.report({ message });
-
-            try {
-              await compileAndSave(fileUri, moduleSystem);
-            } catch (e) {
-              throw new CompilationError(fileUri, e as any);
+        await vscode.window.withProgress(
+          {
+            location: vscode.ProgressLocation.Notification,
+            title: 'Compiling',
+            cancellable: true
+          },
+          async (progress, token) => {
+            progress.report({ message: 'searching files…' });
+            const urisAndFileTypes: [vscode.Uri, vscode.FileType?][] =
+              sourceUris.map(uri => [uri, undefined]);
+            const urisToCompile = await findRuleFiles(urisAndFileTypes, token);
+            if (urisToCompile.length === 0 || token.isCancellationRequested) {
+              return;
             }
 
-            if (token.isCancellationRequested) {
-              break;
+            const step = 100 / urisToCompile.length;
+            for (let i = 0; i < urisToCompile.length; i++) {
+              const fileUri = urisToCompile[i];
+              const fileName = path.basename(fileUri.fsPath);
+              const dirname = path.basename(path.dirname(fileUri.fsPath));
+              const message = `${dirname}${path.sep}${fileName}`;
+              progress.report({ message });
+
+              try {
+                await compileAndSave(fileUri, moduleSystem);
+              } catch (e) {
+                throw new CompilationError(fileUri, e as any);
+              }
+
+              if (token.isCancellationRequested) {
+                break;
+              }
+              progress.report({ increment: step, message });
             }
-            progress.report({ increment: step, message });
           }
-        });
+        );
       } catch (e) {
         if (e instanceof CompilationError) {
           showCompilationError(e);
@@ -68,25 +77,31 @@ export class CompileRuleFileCommand {
         }
       }
     } else {
-      vscode.window.showInformationMessage("Nothing to compile.");
+      vscode.window.showInformationMessage('Nothing to compile.');
     }
   }
 }
 
 function showError(err: Error | string) {
-  vscode.window.showErrorMessage(`Compilation error: ${err instanceof Error ? err.message : err}`);
+  vscode.window.showErrorMessage(
+    `Compilation error: ${err instanceof Error ? err.message : err}`
+  );
 }
 
 function showCompilationError(err: CompilationError) {
   let details = [];
   if (!err.cause) {
-    details.push("An unknown error occurred");
+    details.push('An unknown error occurred');
   } else if (err.cause instanceof SchemaValidationError) {
     if (Array.isArray(err.cause.validationErrors)) {
-      let schemaDetails = "Invalid file schema - ";
-      schemaDetails += err.cause.validationErrors.map(({ keyword, message, params }) => {
-        return `#message(${message}) #keyword(${keyword}) #params(${JSON.stringify(params)})`;
-      }).join(", ");
+      let schemaDetails = 'Invalid file schema - ';
+      schemaDetails += err.cause.validationErrors
+        .map(({ keyword, message, params }) => {
+          return `#message(${message}) #keyword(${keyword}) #params(${JSON.stringify(
+            params
+          )})`;
+        })
+        .join(', ');
       details.push(schemaDetails);
     } else {
       details.push(err.cause.message);
@@ -95,10 +110,13 @@ function showCompilationError(err: CompilationError) {
     details.push(err.cause instanceof Error ? err.cause.message : err.cause);
   }
   details.push(err.uri.fsPath);
-  vscode.window.showErrorMessage(`Compilation error: ${details.join(", ")}`);
+  vscode.window.showErrorMessage(`Compilation error: ${details.join(', ')}`);
 }
 
-async function findRuleFiles(urisAndFileTypes: [vscode.Uri, vscode.FileType?][], token: vscode.CancellationToken): Promise<vscode.Uri[]> {
+async function findRuleFiles(
+  urisAndFileTypes: [vscode.Uri, vscode.FileType?][],
+  token: vscode.CancellationToken
+): Promise<vscode.Uri[]> {
   const result: vscode.Uri[] = [];
   for (let i = 0; i < urisAndFileTypes.length; i++) {
     let [uri, fileType] = urisAndFileTypes[i];
@@ -117,16 +135,18 @@ async function findRuleFiles(urisAndFileTypes: [vscode.Uri, vscode.FileType?][],
         return [];
       }
 
-      result.push(...await findRuleFiles(
-        files.map(file => [vscode.Uri.joinPath(uri, file[0]), file[1]]),
-        token
-      ));
+      result.push(
+        ...(await findRuleFiles(
+          files.map(file => [vscode.Uri.joinPath(uri, file[0]), file[1]]),
+          token
+        ))
+      );
 
       if (token.isCancellationRequested) {
         return [];
       }
     } else if (fileType !== vscode.FileType.Unknown) {
-      if (checkExtension(uri, ".rule")) {
+      if (checkExtension(uri, '.rule')) {
         result.push(uri);
       }
     }
@@ -148,15 +168,22 @@ function validateSchema(data: any) {
   return [success, _schemaValidator.errors];
 }
 
-async function compileAndSave(sourceUri: vscode.Uri, moduleSystem?: ModuleSystem): Promise<void> {
-  let code = "";
+async function compileAndSave(
+  sourceUri: vscode.Uri,
+  moduleSystem?: ModuleSystem
+): Promise<void> {
+  let code = '';
 
   const binaryData = await vscode.workspace.fs.readFile(sourceUri);
-  const fileContents = Buffer.from(binaryData).toString("utf8");
+  const fileContents = Buffer.from(binaryData).toString('utf8');
   if (fileContents) {
     let fileData = JSON.parse(fileContents);
 
-    if (vscode.workspace.getConfiguration("ruleengine.compiler").get("checkSchema", false)) {
+    if (
+      vscode.workspace
+        .getConfiguration('ruleengine.compiler')
+        .get('checkSchema', false)
+    ) {
       const [success, errors] = validateSchema(fileData);
       if (!success) {
         throw new SchemaValidationError(sourceUri, errors);
@@ -164,27 +191,35 @@ async function compileAndSave(sourceUri: vscode.Uri, moduleSystem?: ModuleSystem
     }
 
     code = generateCode(fileData, {
-      runtimeModule: vscode.workspace.getConfiguration("ruleengine.compiler").get("runtimeModule"),
+      runtimeModule: vscode.workspace
+        .getConfiguration('ruleengine.compiler')
+        .get('runtimeModule'),
       esModule: moduleSystem === ModuleSystem.esModule
     });
   }
 
   const pathInfo = path.parse(sourceUri.fsPath);
-  const fileExtension = vscode.workspace.getConfiguration("ruleengine.compiler").get("fileExtension");
-  const newFileUri = vscode.Uri.file(path.join(pathInfo.dir, `${pathInfo.name}.${fileExtension}`));
-  const saveData = Buffer.from(code, "utf8");
+  const fileExtension = vscode.workspace
+    .getConfiguration('ruleengine.compiler')
+    .get('fileExtension');
+  const newFileUri = vscode.Uri.file(
+    path.join(pathInfo.dir, `${pathInfo.name}.${fileExtension}`)
+  );
+  const saveData = Buffer.from(code, 'utf8');
 
   await vscode.workspace.fs.writeFile(newFileUri, saveData);
 }
 
 async function pickModuleSystem(): Promise<ModuleSystem | undefined> {
   let moduleSystem: ModuleSystem | undefined = ModuleSystem.commonJs;
-  const moduleSystemConfig = vscode.workspace.getConfiguration("ruleengine.compiler").get("moduleSystem");
-  if (moduleSystemConfig === "prompt") {
+  const moduleSystemConfig = vscode.workspace
+    .getConfiguration('ruleengine.compiler')
+    .get('moduleSystem');
+  if (moduleSystemConfig === 'prompt') {
     moduleSystem = await showModuleSystemQuickPick();
-  } else if (moduleSystemConfig === "commonjs") {
+  } else if (moduleSystemConfig === 'commonjs') {
     moduleSystem = ModuleSystem.commonJs;
-  } else if (moduleSystemConfig === "esModule") {
+  } else if (moduleSystemConfig === 'esModule') {
     moduleSystem = ModuleSystem.esModule;
   }
   return moduleSystem;
@@ -192,12 +227,12 @@ async function pickModuleSystem(): Promise<ModuleSystem | undefined> {
 
 class SchemaValidationError extends Error {
   constructor(readonly uri: vscode.Uri, readonly validationErrors: any) {
-    super("Invalid file schema");
+    super('Invalid file schema');
   }
 }
 
 class CompilationError extends Error {
   constructor(readonly uri: vscode.Uri, readonly cause: Error) {
-    super("Compilation error");
+    super('Compilation error');
   }
 }
