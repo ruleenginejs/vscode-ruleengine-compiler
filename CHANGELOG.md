@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.8] - 2022-09-12
+### Changed
+- Update dependency packages.
+
 ## [0.0.7] - 2022-03-18
 ### Added
 - Change compiled file extension.
