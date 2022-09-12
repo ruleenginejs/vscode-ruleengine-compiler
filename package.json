@@ -119,12 +119,11 @@
     "deploy": "vsce publish --no-yarn",
     "postversion": "npm run push",
     "push": "git push origin master --tags",
-    "vsix": "npx vsce package",
-    "prepare": "husky install"
+    "vsix": "npx vsce package"
   },
   "dependencies": {
-    "@ruleenginejs/compiler": "1.0.5",
-    "@ruleenginejs/schema": "1.0.5",
+    "@ruleenginejs/compiler": "1.0.6",
+    "@ruleenginejs/schema": "1.0.6",
     "worker-rpc": "0.2.0"
   },
   "devDependencies": {
